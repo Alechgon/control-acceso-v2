@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>CBRE · iCenter Sur — Control de Acceso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<style>
+:root{--green:#003F2D;--green-2:#012a1f;--lime:#17E88F;--sand:#CAD1D3;--paper:#f4f6f5;--warn:#E8A100;--danger:#D7263D;--radius:16px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:'Archivo',system-ui,sans-serif;background:var(--green);color:var(--paper);overflow:hidden;position:fixed;inset:0}
+#app{height:100%;display:flex;flex-direction:column;max-width:560px;margin:0 auto;position:relative}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;animation:fade .3s ease}
+.screen.active{display:flex}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.credit{position:fixed;right:14px;bottom:8px;font-family:'IBM Plex Mono';font-size:9px;color:rgba(255,255,255,.35);z-index:5}
+
+/* ---- HOME ---- */
+#home{justify-content:space-between;padding:40px 24px 32px;
+  background:radial-gradient(120% 80% at 80% -10%,rgba(23,232,143,.18),transparent 60%),
+  radial-gradient(100% 70% at -10% 110%,rgba(23,232,143,.10),transparent 55%),
+  linear-gradient(160deg,var(--green),var(--green-2))}
+.badge{font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.35em;color:var(--lime);text-transform:uppercase}
+.home-c{display:flex;flex-direction:column;gap:14px;margin-top:auto}
+.logo{font-weight:900;font-size:58px;letter-spacing:-.03em;line-height:.88}
+.logo span{color:var(--lime)}
+.rule{height:3px;width:48px;background:var(--lime);border-radius:3px}
+.sub{font-size:20px;font-weight:600;color:var(--sand)}.sub b{color:var(--paper);font-weight:800}
+.desc{font-size:13px;color:rgba(255,255,255,.55);max-width:320px;line-height:1.5}
+.home-b{margin-top:auto;display:flex;flex-direction:column;gap:12px;padding-top:28px}
+.btn{border:none;border-radius:var(--radius);font-family:'Archivo';font-weight:800;font-size:17px;padding:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .1s ease}
+.btn:active{transform:scale(.97)}
+.btn-p{background:var(--lime);color:var(--green-2)}
+.btn-g{background:rgba(255,255,255,.07);color:var(--paper);border:1px solid rgba(255,255,255,.14)}
+.btn-w{width:100%}
+.cfg-line{font-family:'IBM Plex Mono';font-size:10px;color:rgba(255,255,255,.4);display:flex;align-items:center;gap:8px;justify-content:center}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--danger)}.dot.ok{background:var(--lime)}
+
+/* ---- TOPBAR ---- */
+.top{display:flex;align-items:center;gap:12px;padding:16px 18px;background:var(--green-2);border-bottom:1px solid rgba(255,255,255,.08)}
+.bk{background:rgba(255,255,255,.08);border:none;color:#fff;width:40px;height:40px;border-radius:11px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.bk:active{transform:scale(.9)}
+.top h2{font-size:15px;font-weight:700}.top .s{font-family:'IBM Plex Mono';font-size:9px;color:var(--lime);letter-spacing:.2em;text-transform:uppercase}
+.pill{font-family:'IBM Plex Mono';font-size:11px;background:rgba(23,232,143,.15);color:var(--lime);padding:5px 11px;border-radius:18px;margin-left:auto}
+
+/* ---- ID SCREEN ---- */
+#identify{background:linear-gradient(160deg,var(--green),var(--green-2));overflow-y:auto}
+.id-inner{padding:20px 18px 40px;display:flex;flex-direction:column;gap:20px;flex:1}
+.sec{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius);padding:16px}
+.sec-t{font-family:'IBM Plex Mono';font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--lime);margin-bottom:10px}
+.row{display:flex;gap:10px;align-items:center}
+.sel{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:#fff;border-radius:10px;padding:12px;font-family:'Archivo';font-size:16px;font-weight:700;appearance:none;-webkit-appearance:none;cursor:pointer}
+.sel:focus{outline:2px solid var(--lime)}
+.sep{font-weight:800;color:var(--sand);font-size:20px}
+.inp{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:#fff;border-radius:10px;padding:12px;font-family:'Archivo';font-size:16px;font-weight:700;width:100%}
+.inp:focus{outline:2px solid var(--lime);border-color:var(--lime)}
+.inp::placeholder{color:rgba(255,255,255,.3);font-weight:400}
+.inp-sm{width:60px;text-align:center;text-transform:uppercase;letter-spacing:.15em}
+.pat-row{display:flex;align-items:center;gap:6px}
+.link{font-family:'IBM Plex Mono';font-size:10px;color:var(--lime);cursor:pointer;text-decoration:underline;text-underline-offset:3px;margin-top:6px}
+.link:active{opacity:.7}
+.scan-big{background:var(--lime);color:var(--green-2);border:none;border-radius:var(--radius);padding:22px;font-family:'Archivo';font-weight:900;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;width:100%;letter-spacing:.01em;transition:transform .1s}
+.scan-big:active{transform:scale(.97)}
+.scan-big svg{flex-shrink:0}
+.or-line{text-align:center;font-family:'IBM Plex Mono';font-size:9px;color:rgba(255,255,255,.35);letter-spacing:.25em;text-transform:uppercase;padding:4px 0}
+.btn-search{background:rgba(23,232,143,.15);border:1px solid rgba(23,232,143,.3);color:var(--lime);border-radius:var(--radius);padding:16px;font-family:'Archivo';font-weight:800;font-size:15px;cursor:pointer;width:100%;display:none;align-items:center;justify-content:center;gap:8px}
+.btn-search.vis{display:flex}
+.btn-search:active{transform:scale(.97)}
+.num-bod{width:70px;text-align:center}
+
+/* ---- SCAN ---- */
+#scan{background:#000}
+.cam-wrap{position:relative;flex:1;overflow:hidden}
+#video{width:100%;height:100%;object-fit:cover}
+.frame{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:88%;aspect-ratio:1.586;border-radius:12px;box-shadow:0 0 0 4000px rgba(0,0,0,.55);border:2px solid rgba(255,255,255,.45)}
+.mrz-g{position:absolute;left:3%;right:3%;bottom:4%;height:35%;border:2px dashed var(--lime);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono';font-size:9px;color:var(--lime);letter-spacing:.1em;text-align:center;padding:4px;background:rgba(23,232,143,.06)}
+.scan-b{padding:16px 18px 24px;background:var(--green-2);display:flex;flex-direction:column;gap:10px}
+.st{font-family:'IBM Plex Mono';font-size:11px;color:var(--sand);text-align:center;min-height:16px}.st.busy{color:var(--warn)}.st.ok{color:var(--lime)}
+
+/* ---- MANUAL ---- */
+#manual{background:linear-gradient(160deg,var(--green),var(--green-2));overflow-y:auto}
+.man-inner{padding:20px 18px 40px;display:flex;flex-direction:column;gap:16px;flex:1}
+.sex-row{display:flex;gap:8px}
+.sex-btn{flex:1;padding:14px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.04);color:var(--sand);font-family:'Archivo';font-weight:700;font-size:15px;cursor:pointer;text-align:center}
+.sex-btn.on{background:rgba(23,232,143,.2);border-color:var(--lime);color:var(--lime)}
+
+/* ---- VERIFY ---- */
+#verify{background:linear-gradient(160deg,var(--green),var(--green-2));overflow-y:auto}
+.ver-inner{padding:18px 18px 40px;display:flex;flex-direction:column;gap:14px;flex:1}
+.vtag{display:flex;align-items:center;gap:10px;background:rgba(23,232,143,.1);border:1px solid rgba(23,232,143,.25);padding:12px 14px;border-radius:12px}
+.vtag .ic{font-size:20px}.vtag p{font-size:12px;color:var(--sand);line-height:1.4}.vtag b{color:var(--paper)}
+.dcard{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius);overflow:hidden}
+.dr{display:flex;flex-direction:column;gap:3px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.06)}
+.dr:last-child{border-bottom:none}
+.dr .k{font-family:'IBM Plex Mono';font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--lime)}
+.dr .v{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:10px;color:#fff;font-family:'Archivo';font-size:18px;font-weight:700;width:100%}
+.dr .v:focus{outline:2px solid var(--lime)}
+.dr .v.ro{border-color:transparent;background:rgba(255,255,255,.03);color:var(--sand);font-weight:600}
+textarea.v{resize:vertical;min-height:60px;font-size:14px;font-weight:500;line-height:1.4}
+.btn-done{background:var(--lime);color:var(--green-2);font-size:19px;padding:20px}
+.btn-done:disabled{opacity:.45;filter:grayscale(.35)}
+
+/* ---- RESULT ---- */
+.res{position:fixed;inset:0;z-index:70;display:none;flex-direction:column;align-items:center;justify-content:center;padding:28px;text-align:center;animation:fade .25s ease}
+.res.show{display:flex}
+.res.ok{background:linear-gradient(160deg,#046b3f,#012a1f)}
+.res.block{background:linear-gradient(160deg,#9e0f24,#5a0712)}
+.res .big{font-size:80px;margin-bottom:6px}
+.res h1{font-size:30px;font-weight:900;line-height:1.05;margin-bottom:10px}
+.res p{font-size:15px;color:rgba(255,255,255,.82);max-width:320px;line-height:1.4}
+.res .who{font-family:'IBM Plex Mono';font-size:13px;margin-top:12px;background:rgba(255,255,255,.12);padding:10px 16px;border-radius:10px}
+.res .btn{margin-top:28px;min-width:200px}
+.res.block .btn{background:#fff;color:#9e0f24}
+.res.ok .btn{background:var(--lime);color:var(--green-2)}
+
+/* ---- MODALS ---- */
+.mbg{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:60;padding:20px}
+.mbg.show{display:flex}
+.mod{background:var(--green-2);border:1px solid rgba(255,255,255,.14);border-radius:var(--radius);padding:22px;width:100%;max-width:400px;display:flex;flex-direction:column;gap:12px}
+.mod h3{font-size:17px}
+.mod label{font-family:'IBM Plex Mono';font-size:10px;color:var(--lime);letter-spacing:.15em;text-transform:uppercase}
+.mod input{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);color:#fff;border-radius:10px;padding:13px;font-size:14px;font-family:'IBM Plex Mono';width:100%}
+.mod input:focus{outline:2px solid var(--lime)}
+.mod small{color:rgba(255,255,255,.45);font-size:10px;line-height:1.5}
+.lbox{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:10px;font-family:'IBM Plex Mono';font-size:10px;word-break:break-all;color:var(--sand)}
+.errmsg{color:#ff9aa6;font-size:11px;min-height:13px}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(120px);background:#fff;color:var(--green-2);font-weight:800;padding:14px 22px;border-radius:12px;box-shadow:0 10px 36px rgba(0,0,0,.4);transition:transform .35s cubic-bezier(.2,1.2,.3,1);z-index:80;display:flex;align-items:center;gap:8px;font-size:14px;max-width:90%}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.err{background:var(--danger);color:#fff}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ===== HOME ===== -->
+<section id="home" class="screen active">
+  <div><span class="badge">Sistema de Registro</span></div>
+  <div class="home-c">
+    <div class="logo">CB<span>RE</span></div>
+    <div class="rule"></div>
+    <div class="sub"><b>iCenter Sur</b><br>Control de Acceso</div>
+    <p class="desc">Registra ingresos escaneando la cédula, ingresando patente o datos manuales.</p>
+  </div>
+  <div class="home-b">
+    <button class="btn btn-p btn-w" onclick="goId()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M13.8 12H3"/></svg>
+      Ingreso
+    </button>
+    <button class="btn btn-g btn-w" onclick="askPass()">Configuración</button>
+    <div class="cfg-line"><span id="cfgDot" class="dot"></span><span id="cfgTxt">Verificando…</span></div>
+  </div>
+</section>
+
+<!-- ===== IDENTIFY ===== -->
+<section id="identify" class="screen">
+  <div class="top">
+    <button class="bk" onclick="goHome()">‹</button>
+    <div><h2>Nuevo Ingreso</h2><div class="s">Identificación</div></div>
+    <span class="pill" id="pill">0 hoy</span>
+  </div>
+  <div class="id-inner">
+    <!-- BODEGA -->
+    <div class="sec">
+      <div class="sec-t">Bodega</div>
+      <div class="row">
+        <select class="sel" id="bodLet" onchange="bodChange()">
+          <option value="">N/A</option>
+          <option>A</option><option>B</option><option>C</option>
+        </select>
+        <span class="sep">—</span>
+        <input class="inp num-bod" id="bodNum" type="number" inputmode="numeric" placeholder="N°" disabled>
+      </div>
+    </div>
+    <!-- PATENTE -->
+    <div class="sec">
+      <div class="sec-t">Patente <span style="font-weight:400;opacity:.5">(opcional)</span></div>
+      <div id="patCl">
+        <div class="pat-row">
+          <input class="inp inp-sm" id="p1" maxlength="2" inputmode="text" autocapitalize="characters" oninput="patAuto(this,'p2')">
+          <span class="sep">·</span>
+          <input class="inp inp-sm" id="p2" maxlength="2" inputmode="text" autocapitalize="characters" oninput="patAuto(this,'p3')">
+          <span class="sep">·</span>
+          <input class="inp inp-sm" id="p3" maxlength="2" inputmode="text" autocapitalize="characters">
+        </div>
+      </div>
+      <div id="patInt" style="display:none">
+        <input class="inp" id="pInt" placeholder="Ingrese patente internacional" autocapitalize="characters">
+      </div>
+      <span class="link" id="patToggle" onclick="togglePat()">* Patente internacional</span>
+    </div>
+    <!-- IDENTIFICACIÓN -->
+    <div class="sec">
+      <div class="sec-t">Identificación</div>
+      <button class="scan-big" onclick="goScan()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2"/><line x1="7" y1="12" x2="17" y2="12"/></svg>
+        Escanear Cédula
+      </button>
+      <span class="link" style="text-align:center;display:block" onclick="goManual()">Ingreso manual</span>
+    </div>
+    <div class="or-line">— o busca por patente —</div>
+    <button class="btn-search" id="btnSearch" onclick="searchPlate()">Buscar por patente</button>
+  </div>
+</section>
+
+<!-- ===== SCAN ===== -->
+<section id="scan" class="screen">
+  <div class="top">
+    <button class="bk" onclick="goId()">‹</button>
+    <div><h2>Escanear cédula</h2><div class="s">MRZ · reverso del carnet</div></div>
+  </div>
+  <div class="cam-wrap">
+    <video id="video" playsinline muted></video>
+    <div class="frame"><div class="mrz-g">ALINEA LAS 3 LÍNEAS CON &lt;&lt;&lt; DENTRO DE ESTE RECUADRO</div></div>
+  </div>
+  <div class="scan-b">
+    <div class="st" id="scanSt">Cámara lista</div>
+    <button class="btn btn-p" onclick="capture()">Capturar</button>
+  </div>
+</section>
+
+<!-- ===== MANUAL ===== -->
+<section id="manual" class="screen">
+  <div class="top">
+    <button class="bk" onclick="goId()">‹</button>
+    <div><h2>Ingreso Manual</h2><div class="s">Escriba los datos</div></div>
+  </div>
+  <div class="man-inner">
+    <div class="sec">
+      <div class="sec-t">RUN</div>
+      <input class="inp" id="mRun" placeholder="12.345.678-9" inputmode="text">
+    </div>
+    <div class="sec">
+      <div class="sec-t">Nombre completo</div>
+      <input class="inp" id="mName" placeholder="Nombre y apellidos" autocapitalize="words">
+    </div>
+    <div class="sec">
+      <div class="sec-t">Sexo</div>
+      <div class="sex-row">
+        <div class="sex-btn" onclick="pickSex(this,'Masculino')">Masculino</div>
+        <div class="sex-btn" onclick="pickSex(this,'Femenino')">Femenino</div>
+      </div>
+    </div>
+    <button class="btn btn-p btn-w" style="margin-top:auto" onclick="manualContinue()">Continuar</button>
+  </div>
+</section>
+
+<!-- ===== VERIFY ===== -->
+<section id="verify" class="screen">
+  <div class="top">
+    <button class="bk" onclick="goId()">‹</button>
+    <div><h2>Verificar datos</h2><div class="s">Compara con el documento</div></div>
+  </div>
+  <div class="ver-inner">
+    <div class="vtag"><span class="ic">👁️</span><p>Verifica <b>visualmente</b> los datos. Puedes editar cualquier campo.</p></div>
+    <div class="dcard">
+      <div class="dr"><span class="k">RUN</span><input class="v" id="vRun"></div>
+      <div class="dr"><span class="k">Nombre</span><input class="v" id="vName"></div>
+      <div class="dr"><span class="k">Sexo</span><input class="v" id="vSex"></div>
+      <div class="dr"><span class="k">Empresa</span><input class="v ro" id="vEmp" readonly></div>
+      <div class="dr"><span class="k">Bodega</span><input class="v ro" id="vBod" readonly></div>
+      <div class="dr"><span class="k">Patente</span><input class="v ro" id="vPat" readonly></div>
+      <div class="dr"><span class="k">Observaciones</span><textarea class="v" id="vObs" placeholder="Proveedor, visita, empresa de origen…"></textarea></div>
+    </div>
+    <button class="btn btn-done btn-w" id="btnDone" onclick="saveRecord()">✓ Realizado — Registrar</button>
+    <button class="btn btn-g btn-w" onclick="goId()">Volver</button>
+  </div>
+</section>
+
+<div class="credit">Creado por M. Echeverría</div>
+</div>
+
+<!-- RESULT -->
+<div class="res" id="res">
+  <div class="big" id="rIc">✓</div>
+  <h1 id="rTit">Ingreso registrado</h1>
+  <p id="rMsg"></p>
+  <div class="who" id="rWho"></div>
+  <button class="btn" onclick="closeRes()">Continuar</button>
+</div>
+
+<!-- PASS MODAL -->
+<div class="mbg" id="passMod">
+  <div class="mod">
+    <h3>Acceso a configuración</h3>
+    <label>Contraseña</label>
+    <input id="passInp" type="password" inputmode="numeric" placeholder="••••••••">
+    <div class="errmsg" id="passErr"></div>
+    <button class="btn btn-p" onclick="checkPass()">Entrar</button>
+    <button class="btn btn-g" onclick="closePass()">Cancelar</button>
+  </div>
+</div>
+<!-- CFG MODAL -->
+<div class="mbg" id="cfgMod">
+  <div class="mod">
+    <h3>Conexión activa</h3>
+    <label>Link actual</label>
+    <div class="lbox" id="curLink">—</div>
+    <label>Nuevo link (Apps Script)</label>
+    <input id="cfgInp" placeholder="https://script.google.com/.../exec">
+    <small>Guarda en este dispositivo. Para fijarlo en el código, edita DEFAULT_ENDPOINT en index.html.</small>
+    <button class="btn btn-p" onclick="saveLink()">Guardar</button>
+    <button class="btn btn-g" onclick="clearLink()">Eliminar link</button>
+    <button class="btn btn-g" onclick="closeCfg()">Cerrar</button>
+  </div>
+</div>
+<div class="toast" id="toast"><span id="tIc">✓</span><span id="tMsg"></span></div>
+
+<script>
+/* ==================== CONFIGURACIÓN FIJA ==================== */
+const DEFAULT_ENDPOINT = "";           // Pega tu /exec aquí
+const CONFIG_PASSWORD  = "123456789";
+/* ============================================================ */
+
+const S={ep:"",count:0,stream:null,ocrW:null,override:null,manSex:"",intPat:false};
+function ep(){return S.override||DEFAULT_ENDPOINT||""}
+
+/* ---- NAV ---- */
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active')}
+function goHome(){stopCam();show('home')}
+function goId(){stopCam();show('identify');checkSearchBtn()}
+async function goScan(){show('scan');await startCam()}
+function goManual(){show('manual');S.manSex=''}
+
+/* ---- BODEGA ---- */
+function bodChange(){
+  const l=document.getElementById('bodLet').value;
+  const n=document.getElementById('bodNum');
+  n.disabled=!l; if(!l)n.value='';
+}
+function getBod(){
+  const l=document.getElementById('bodLet').value;
+  const n=document.getElementById('bodNum').value;
+  if(!l)return'';
+  return l+(n?'-'+n:'');
+}
+function bodValid(){
+  const l=document.getElementById('bodLet').value;
+  const n=document.getElementById('bodNum').value;
+  if(l&&!n){toast('Indica el número de bodega','!',true);return false}
+  return true;
+}
+
+/* ---- PATENTE ---- */
+function patAuto(el,nxt){
+  el.value=el.value.toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if(el.value.length>=2){const n=document.getElementById(nxt);if(n)n.focus()}
+}
+function togglePat(){
+  S.intPat=!S.intPat;
+  document.getElementById('patCl').style.display=S.intPat?'none':'block';
+  document.getElementById('patInt').style.display=S.intPat?'block':'none';
+  document.getElementById('patToggle').textContent=S.intPat?'* Patente chilena':'* Patente internacional';
+  checkSearchBtn();
+}
+function getPat(){
+  if(S.intPat)return document.getElementById('pInt').value.trim().toUpperCase();
+  const a=document.getElementById('p1').value,b=document.getElementById('p2').value,c=document.getElementById('p3').value;
+  if(!a&&!b&&!c)return'';
+  return(a+b+c).toUpperCase();
+}
+function checkSearchBtn(){
+  const p=getPat();
+  document.getElementById('btnSearch').classList.toggle('vis',p.length>=4);
+}
+['p1','p2','p3','pInt'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el)el.addEventListener('input',checkSearchBtn);
+});
+
+/* ---- SEARCH BY PLATE ---- */
+async function searchPlate(){
+  if(!bodValid())return;
+  const pat=getPat();
+  if(pat.length<4){toast('Ingresa la patente completa','!',true);return}
+  if(!ep()){toast('Configure el link primero','!',true);return}
+  toast('Buscando patente…','⏳',false);
+  try{
+    const r=await fetch(ep()+'?action=searchPlate&patente='+encodeURIComponent(pat));
+    const d=await r.json();
+    if(d.found){
+      fillVerify({run:d.run||'',nombre:d.nombre||'',sexo:d.sexo||'',empresa:d.empresa||''});
+      show('verify');
+    }else{
+      toast('Patente no encontrada en padrón','!',true);
+    }
+  }catch(e){toast('Error de conexión','!',true)}
+}
+
+/* ---- SEX PICKER ---- */
+function pickSex(el,v){
+  S.manSex=v;
+  document.querySelectorAll('.sex-btn').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+}
+
+/* ---- MANUAL CONTINUE ---- */
+function manualContinue(){
+  const run=document.getElementById('mRun').value.trim();
+  const name=document.getElementById('mName').value.trim();
+  if(!run&&!name){toast('Ingresa al menos RUN o nombre','!',true);return}
+  if(!bodValid())return;
+  fillVerify({run,nombre:name,sexo:S.manSex});
+  show('verify');
+}
+
+/* ---- CAMERA ---- */
+async function startCam(){
+  const v=document.getElementById('video');setSt('Iniciando cámara…','busy');
+  try{
+    if(S.stream)stopCam();
+    S.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false});
+    v.srcObject=S.stream;await v.play();
+    setSt('Alinea la MRZ y captura','');
+  }catch(e){setSt('Error cámara: '+e.message,'busy')}
+}
+function stopCam(){if(S.stream){S.stream.getTracks().forEach(t=>t.stop());S.stream=null}}
+
+/* ---- OCR CAPTURE ---- */
+async function capture(){
+  const v=document.getElementById('video');
+  if(!v.videoWidth){setSt('Cámara no lista','busy');return}
+  setSt('Leyendo MRZ…','busy');
+  const vw=v.videoWidth,vh=v.videoHeight,c=document.createElement('canvas');
+  const cy=Math.floor(vh*.50),ch=Math.floor(vh*.48),cx=Math.floor(vw*.03),cw=Math.floor(vw*.94);
+  c.width=cw;c.height=ch;
+  const ctx=c.getContext('2d');
+  ctx.drawImage(v,cx,cy,cw,ch,0,0,cw,ch);
+  // preprocess: grayscale + high contrast threshold
+  const img=ctx.getImageData(0,0,cw,ch),d=img.data;
+  for(let i=0;i<d.length;i+=4){
+    let g=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];
+    g=g>130?255:(g<90?0:g);
+    d[i]=d[i+1]=d[i+2]=g;
+  }
+  ctx.putImageData(img,0,0);
+  try{
+    if(!S.ocrW){
+      setSt('Cargando modelo MRZ (primera vez)…','busy');
+      try{
+        // Try MRZ-specific model first (Doubango Telecom, open source)
+        S.ocrW=await Tesseract.createWorker('mrz',1,{
+          langPath:'https://raw.githubusercontent.com/DoubangoTelecom/tesseractMRZ/master/tessdata_fast',
+          cacheMethod:'write'
+        });
+      }catch(e){
+        // Fallback to English model
+        setSt('Cargando modelo alternativo…','busy');
+        S.ocrW=await Tesseract.createWorker('eng');
+      }
+      await S.ocrW.setParameters({
+        tessedit_char_whitelist:'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<',
+        tessedit_pageseg_mode:'6'
+      });
+    }
+    const {data}=await S.ocrW.recognize(c);
+    const p=parseTD1(data.text);
+    if(p){
+      if(!bodValid())return;
+      fillVerify(p);stopCam();show('verify');
+    }else{
+      setSt('No se detectó MRZ. Acerca y reintenta.','busy');
+    }
+  }catch(e){setSt('Error: '+e.message,'busy')}
+}
+
+/* ---- TD1 PARSER (ICAO 9303 — Chilean cédula) ----
+   Line 1: I<CHL[docnum][dv][optional...]<<<   (30 chars) → IGNORAR
+   Line 2: [DOB 6][dv][SEX][EXP 6][dv]CHL[RUN][<][DV_RUN][<][composite]  (30 chars)
+   Line 3: [SURNAME]<[SURNAME2]<<[NAME1]<[NAME2]<<<  (30 chars)
+*/
+function parseTD1(raw){
+  let lines=raw.toUpperCase().split('\n')
+    .map(l=>l.replace(/[^A-Z0-9<]/g,'').trim())
+    .filter(l=>l.length>=20);
+  if(lines.length<2)return null;
+
+  // Count helpers
+  const cD=s=>(s.match(/\d/g)||[]).length;
+  const cL=s=>(s.match(/[A-Z]/g)||[]).length;
+
+  // Identify lines strictly
+  let lData=null,lDoc=null,lName=null;
+
+  // LINE 2 (data): has CHL in middle + most digits
+  let bestD=-1;
+  for(const l of lines){
+    const d=cD(l);
+    if(/CHL/.test(l)&&d>=11&&d>bestD){bestD=d;lData=l}
+  }
+  // LINE 1 (doc): starts with I, has CHL near start
+  for(const l of lines){
+    if(l===lData)continue;
+    if(/^I.{0,2}CHL/.test(l)||/^I</.test(l)){lDoc=l;break}
+  }
+  // LINE 3 (name): most letters, not data/doc
+  let bestN=-1;
+  for(const l of lines){
+    if(l===lData||l===lDoc)continue;
+    const lt=cL(l);
+    if(lt>=4&&lt>cD(l)&&/</.test(l)&&lt>bestN){bestN=lt;lName=l}
+  }
+  if(!lName){for(const l of lines){if(l!==lData&&l!==lDoc){const lt=cL(l);if(lt>bestN){bestN=lt;lName=l}}}}
+
+  const res={run:'',nombre:'',sexo:''};
+
+  // NAME
+  if(lName){
+    const pts=lName.split('<<');
+    const ap=(pts[0]||'').replace(/</g,' ').trim();
+    const nm=(pts[1]||'').replace(/</g,' ').trim();
+    res.nombre=(nm+' '+ap).replace(/\s+/g,' ').trim();
+    if(!res.nombre)res.nombre=lName.replace(/</g,' ').replace(/\s+/g,' ').trim();
+  }
+
+  // DATA: sex + RUN
+  if(lData){
+    const sx=lData.match(/\d([MF])\d/);
+    if(sx)res.sexo=sx[1]==='M'?'Masculino':'Femenino';
+    else if(/M/.test(lData)&&!/F/.test(lData))res.sexo='Masculino';
+    else if(/F/.test(lData))res.sexo='Femenino';
+
+    // RUN: after CHL → digits until first '<' = body, char after '<' = DV
+    const idx=lData.indexOf('CHL');
+    if(idx!==-1){
+      const rest=lData.slice(idx+3);
+      const cut=rest.indexOf('<');
+      let body='',dv='';
+      if(cut!==-1){
+        body=rest.slice(0,cut).replace(/[^0-9K]/g,'');
+        const after=rest.slice(cut).replace(/</g,'');
+        dv=(after.charAt(0)||'').replace(/[^0-9K]/g,'');
+      }else{
+        const m=rest.match(/(\d{7,8})([0-9K])/);
+        if(m){body=m[1];dv=m[2]}
+      }
+      if(body&&dv)res.run=fmtRun(body,dv);
+    }
+  }
+
+  if(!res.nombre&&!res.run)return null;
+  return res;
+}
+function fmtRun(b,d){
+  let c=b.split('').reverse().join(''),o='';
+  for(let i=0;i<c.length;i++){o+=c[i];if((i+1)%3===0&&i!==c.length-1)o+='.'}
+  return o.split('').reverse().join('')+'-'+d;
+}
+
+/* ---- FILL VERIFY ---- */
+function fillVerify(p){
+  document.getElementById('vRun').value=p.run||'';
+  document.getElementById('vName').value=p.nombre||'';
+  document.getElementById('vSex').value=p.sexo||'';
+  document.getElementById('vEmp').value=p.empresa||'';
+  document.getElementById('vBod').value=getBod();
+  document.getElementById('vPat').value=getPat();
+  document.getElementById('vObs').value='';
+}
+
+/* ---- SAVE ---- */
+async function saveRecord(){
+  const rec={
+    run:document.getElementById('vRun').value.trim(),
+    nombre:document.getElementById('vName').value.trim(),
+    sexo:document.getElementById('vSex').value.trim(),
+    bodega:document.getElementById('vBod').value.trim(),
+    patente:document.getElementById('vPat').value.trim(),
+    observaciones:document.getElementById('vObs').value.trim(),
+    hora:new Date().toLocaleString('es-CL',{dateStyle:'short',timeStyle:'medium'})
+  };
+  const btn=document.getElementById('btnDone');btn.disabled=true;btn.textContent='Registrando…';
+  if(!ep()){btn.disabled=false;btn.textContent='✓ Realizado — Registrar';toast('Configure el link','!',true);return}
+
+  let resp=null,err='';
+  try{
+    const url=ep()+'?action=register&'+new URLSearchParams(rec).toString();
+    const r=await fetch(url,{method:'GET',redirect:'follow'});
+    const txt=await r.text();
+    try{resp=JSON.parse(txt)}catch(pe){err='Respuesta no JSON: '+txt.slice(0,100)}
+  }catch(e){err=e.message}
+
+  S.count++;document.getElementById('pill').textContent=S.count+' hoy';
+  btn.disabled=false;btn.textContent='✓ Realizado — Registrar';
+
+  if(resp){
+    if(resp.blocked)showRes('block',rec,resp);
+    else showRes('ok',rec,resp);
+  }else{toast('Error: '+(err||'desconocido'),'!',true)}
+}
+
+/* ---- RESULT ---- */
+function showRes(t,rec,resp){
+  const el=document.getElementById('res');el.className='res show '+t;
+  if(t==='block'){
+    document.getElementById('rIc').textContent='⛔';
+    document.getElementById('rTit').textContent='PROHIBICIÓN DE INGRESO';
+    document.getElementById('rMsg').textContent='Esta persona está en la lista de prohibidos.';
+  }else{
+    document.getElementById('rIc').textContent='✓';
+    document.getElementById('rTit').textContent='Ingreso Registrado';
+    document.getElementById('rMsg').textContent=resp.empresa?'Empresa: '+resp.empresa:'Sin empresa asignada.';
+  }
+  document.getElementById('rWho').textContent=(rec.nombre||'')+'  ·  '+(rec.run||'');
+}
+function closeRes(){document.getElementById('res').classList.remove('show');goId();clearIdFields()}
+function clearIdFields(){
+  ['p1','p2','p3','pInt','mRun','mName'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=''});
+  document.querySelectorAll('.sex-btn').forEach(b=>b.classList.remove('on'));
+  S.manSex='';checkSearchBtn();
+}
+
+/* ---- CONFIG ---- */
+function askPass(){document.getElementById('passInp').value='';document.getElementById('passErr').textContent='';document.getElementById('passMod').classList.add('show')}
+function closePass(){document.getElementById('passMod').classList.remove('show')}
+function checkPass(){
+  if(document.getElementById('passInp').value===CONFIG_PASSWORD){closePass();openCfg()}
+  else document.getElementById('passErr').textContent='Contraseña incorrecta';
+}
+function openCfg(){document.getElementById('curLink').textContent=ep()||'No configurado';document.getElementById('cfgInp').value='';document.getElementById('cfgMod').classList.add('show')}
+function closeCfg(){document.getElementById('cfgMod').classList.remove('show')}
+function saveLink(){const v=document.getElementById('cfgInp').value.trim();if(v){S.override=v;try{localStorage.setItem('ca_ep',v)}catch(e){}}closeCfg();refreshCfg()}
+function clearLink(){S.override=null;try{localStorage.removeItem('ca_ep')}catch(e){}closeCfg();refreshCfg()}
+function refreshCfg(){
+  const d=document.getElementById('cfgDot'),t=document.getElementById('cfgTxt');
+  if(ep()){d.classList.add('ok');t.textContent='Conectado'}
+  else{d.classList.remove('ok');t.textContent='Sin conexión'}
+}
+
+/* ---- HELPERS ---- */
+function setSt(t,c){const s=document.getElementById('scanSt');s.textContent=t;s.className='st '+(c||'')}
+function toast(m,i,e){const t=document.getElementById('toast');document.getElementById('tMsg').textContent=m;document.getElementById('tIc').textContent=i;t.className='toast show'+(e?' err':'');setTimeout(()=>t.classList.remove('show'),2400)}
+
+try{const s=localStorage.getItem('ca_ep');if(s)S.override=s}catch(e){}
+refreshCfg();
+</script>
+</body>
+</html>
