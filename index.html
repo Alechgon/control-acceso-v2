@@ -439,18 +439,8 @@ async function capture(){
   ctx.putImageData(img,0,0);
   try{
     if(!S.ocrW){
-      setSt('Cargando modelo MRZ (primera vez)…','busy');
-      try{
-        // Try MRZ-specific model first (Doubango Telecom, open source)
-        S.ocrW=await Tesseract.createWorker('mrz',1,{
-          langPath:'https://raw.githubusercontent.com/DoubangoTelecom/tesseractMRZ/master/tessdata_fast',
-          cacheMethod:'write'
-        });
-      }catch(e){
-        // Fallback to English model
-        setSt('Cargando modelo alternativo…','busy');
-        S.ocrW=await Tesseract.createWorker('eng');
-      }
+      setSt('Cargando OCR (primera vez)…','busy');
+      S.ocrW=await Tesseract.createWorker('eng');
       await S.ocrW.setParameters({
         tessedit_char_whitelist:'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<',
         tessedit_pageseg_mode:'6'
