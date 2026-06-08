@@ -3,146 +3,123 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>CBRE · iCenter Sur — Control de Acceso</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<title>CBRE · iCenter Sur</title>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{--g:#003F2D;--g2:#012a1f;--li:#17E88F;--sa:#CAD1D3;--pa:#f4f6f5;--wa:#E8A100;--da:#D7263D;--r:14px}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%}
-body{font-family:'Archivo',system-ui,sans-serif;background:var(--g);color:var(--pa);overflow:hidden;position:fixed;inset:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Archivo',system-ui,sans-serif;background:var(--g);color:var(--pa);position:fixed;inset:0}
 #app{height:100%;max-width:560px;margin:0 auto;position:relative}
-.sc{position:absolute;inset:0;display:none;flex-direction:column;animation:fd .25s ease}
-.sc.on{display:flex}
-@keyframes fd{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
-.cr{position:fixed;right:12px;bottom:6px;font-family:'IBM Plex Mono';font-size:8px;color:rgba(255,255,255,.3);z-index:5}
+.sc{position:absolute;inset:0;display:none;flex-direction:column;animation:fd .25s ease}.sc.on{display:flex}
+@keyframes fd{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.cr{position:fixed;right:10px;bottom:5px;font-family:'IBM Plex Mono';font-size:8px;color:rgba(255,255,255,.25);z-index:5}
+/* Buttons */
+.bt{border:none;border-radius:var(--r);font-family:'Archivo';font-weight:800;font-size:15px;padding:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .1s}.bt:active{transform:scale(.97)}.bt:disabled{opacity:.45}
+.bp{background:var(--li);color:var(--g2)}.bg2{background:rgba(255,255,255,.06);color:var(--pa);border:1px solid rgba(255,255,255,.1)}.bw{width:100%}
+.bda{background:var(--da);color:#fff}
+/* Inputs */
+.ip{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#fff;border-radius:9px;padding:10px;font-family:'Archivo';font-size:14px;font-weight:700;width:100%}.ip:focus{outline:2px solid var(--li);border-color:var(--li)}.ip::placeholder{color:rgba(255,255,255,.25);font-weight:400}
+.sl{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#fff;border-radius:9px;padding:10px;font-family:'Archivo';font-size:14px;font-weight:700;appearance:none;cursor:pointer}.sl:focus{outline:2px solid var(--li)}
+/* Sections */
+.sc2{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:var(--r);padding:12px}
+.st2{font-family:'IBM Plex Mono';font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--li);margin-bottom:7px}
+.rw{display:flex;gap:7px;align-items:center}
+.sp{font-weight:800;color:var(--sa);font-size:16px}
+.lk{font-family:'IBM Plex Mono';font-size:9px;color:var(--li);cursor:pointer;text-decoration:underline;text-underline-offset:3px;margin-top:4px}.lk:active{opacity:.5}
+/* Topbar */
+.tp{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--g2);border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0}
+.bk{background:rgba(255,255,255,.06);border:none;color:#fff;width:36px;height:36px;border-radius:9px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}.bk:active{transform:scale(.9)}
+.tp h2{font-size:13px;font-weight:700}.tp .ts{font-family:'IBM Plex Mono';font-size:7px;color:var(--li);letter-spacing:.16em;text-transform:uppercase}
+.pl{font-family:'IBM Plex Mono';font-size:9px;background:rgba(23,232,143,.12);color:var(--li);padding:4px 9px;border-radius:14px;margin-left:auto}
 
 /* HOME */
-#home{justify-content:space-between;padding:36px 22px 28px;background:radial-gradient(120% 80% at 80% -10%,rgba(23,232,143,.18),transparent 60%),linear-gradient(160deg,var(--g),var(--g2))}
-.bg{font-family:'IBM Plex Mono';font-size:9px;letter-spacing:.35em;color:var(--li);text-transform:uppercase}
-.hc{display:flex;flex-direction:column;gap:12px;margin-top:auto}
-.lo{font-weight:900;font-size:54px;letter-spacing:-.03em;line-height:.88}.lo span{color:var(--li)}
-.rl{height:3px;width:44px;background:var(--li);border-radius:3px}
-.sb{font-size:19px;font-weight:600;color:var(--sa)}.sb b{color:var(--pa);font-weight:800}
-.ds{font-size:12px;color:rgba(255,255,255,.5);max-width:300px;line-height:1.5}
-.hb{margin-top:auto;display:flex;flex-direction:column;gap:10px;padding-top:24px}
-.bt{border:none;border-radius:var(--r);font-family:'Archivo';font-weight:800;font-size:16px;padding:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:transform .1s}
-.bt:active{transform:scale(.97)}.bt:disabled{opacity:.5}
-.bp{background:var(--li);color:var(--g2)}.bg2{background:rgba(255,255,255,.07);color:var(--pa);border:1px solid rgba(255,255,255,.12)}
-.bw{width:100%}
-.cl{font-family:'IBM Plex Mono';font-size:9px;color:rgba(255,255,255,.38);display:flex;align-items:center;gap:7px;justify-content:center}
+#home{justify-content:space-between;padding:32px 20px 24px;background:radial-gradient(120% 80% at 80% -10%,rgba(23,232,143,.16),transparent 60%),linear-gradient(160deg,var(--g),var(--g2))}
+.lo{font-weight:900;font-size:50px;letter-spacing:-.03em;line-height:.88}.lo span{color:var(--li)}
+.rl{height:3px;width:40px;background:var(--li);border-radius:3px}
+.hc{display:flex;flex-direction:column;gap:10px;margin-top:auto}
+.hb{margin-top:auto;display:flex;flex-direction:column;gap:9px;padding-top:20px}
+.cl{font-family:'IBM Plex Mono';font-size:8px;color:rgba(255,255,255,.35);display:flex;align-items:center;gap:6px;justify-content:center}
 .dt{width:6px;height:6px;border-radius:50%;background:var(--da)}.dt.ok{background:var(--li)}
-/* OCR preload bar */
-.pbar{height:3px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden;margin-top:4px}
-.pbar .fill{height:100%;background:var(--li);width:0%;transition:width .3s}
+.pbar{height:3px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;margin-top:3px}.pbar .fill{height:100%;background:var(--li);width:0%;transition:width .3s}
 
-/* TOPBAR */
-.tp{display:flex;align-items:center;gap:11px;padding:14px 16px;background:var(--g2);border-bottom:1px solid rgba(255,255,255,.07)}
-.bk{background:rgba(255,255,255,.07);border:none;color:#fff;width:38px;height:38px;border-radius:10px;font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center}.bk:active{transform:scale(.9)}
-.tp h2{font-size:14px;font-weight:700}.tp .ts{font-family:'IBM Plex Mono';font-size:8px;color:var(--li);letter-spacing:.18em;text-transform:uppercase}
-.pl{font-family:'IBM Plex Mono';font-size:10px;background:rgba(23,232,143,.14);color:var(--li);padding:4px 10px;border-radius:16px;margin-left:auto}
-
-/* ID SCREEN */
+/* ID */
 #identify{background:linear-gradient(160deg,var(--g),var(--g2));overflow-y:auto}
-.idn{padding:16px 16px 36px;display:flex;flex-direction:column;gap:16px;flex:1}
-.sc2{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.09);border-radius:var(--r);padding:14px}
-.st2{font-family:'IBM Plex Mono';font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--li);margin-bottom:8px}
-.rw{display:flex;gap:8px;align-items:center}
-.sl{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);color:#fff;border-radius:9px;padding:11px;font-family:'Archivo';font-size:15px;font-weight:700;appearance:none;cursor:pointer}
-.sl:focus{outline:2px solid var(--li)}
-.sp{font-weight:800;color:var(--sa);font-size:18px}
-.ip{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);color:#fff;border-radius:9px;padding:11px;font-family:'Archivo';font-size:15px;font-weight:700;width:100%}
-.ip:focus{outline:2px solid var(--li);border-color:var(--li)}
-.ip::placeholder{color:rgba(255,255,255,.28);font-weight:400}
-.ism{width:55px;text-align:center;text-transform:uppercase;letter-spacing:.12em}
-.pr{display:flex;align-items:center;gap:5px}
-.lk{font-family:'IBM Plex Mono';font-size:9px;color:var(--li);cursor:pointer;text-decoration:underline;text-underline-offset:3px;margin-top:5px}.lk:active{opacity:.6}
-.sbig{background:var(--li);color:var(--g2);border:none;border-radius:var(--r);padding:20px;font-family:'Archivo';font-weight:900;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;transition:transform .1s}
-.sbig:active{transform:scale(.97)}.sbig:disabled{opacity:.45}
-.orl{text-align:center;font-family:'IBM Plex Mono';font-size:8px;color:rgba(255,255,255,.3);letter-spacing:.2em;text-transform:uppercase;padding:2px 0}
-.bsr{background:rgba(23,232,143,.14);border:1px solid rgba(23,232,143,.25);color:var(--li);border-radius:var(--r);padding:14px;font-family:'Archivo';font-weight:800;font-size:14px;cursor:pointer;width:100%;display:none;align-items:center;justify-content:center;gap:7px}
-.bsr.vis{display:flex}.bsr:active{transform:scale(.97)}
-.nb{width:65px;text-align:center}
+.idn{padding:14px 14px 32px;display:flex;flex-direction:column;gap:14px;flex:1}
+.ism{width:50px;text-align:center;text-transform:uppercase;letter-spacing:.1em}
+.pr{display:flex;align-items:center;gap:4px}
+.nb{width:60px;text-align:center}
+.sbig{background:var(--li);color:var(--g2);border:none;border-radius:var(--r);padding:18px;font-family:'Archivo';font-weight:900;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;width:100%;transition:transform .1s}.sbig:active{transform:scale(.97)}.sbig:disabled{opacity:.4}
+.orl{text-align:center;font-family:'IBM Plex Mono';font-size:7px;color:rgba(255,255,255,.25);letter-spacing:.2em;text-transform:uppercase;padding:2px 0}
+.bsr{background:rgba(23,232,143,.12);border:1px solid rgba(23,232,143,.2);color:var(--li);border-radius:var(--r);padding:13px;font-family:'Archivo';font-weight:800;font-size:13px;cursor:pointer;width:100%;display:none;align-items:center;justify-content:center;gap:6px}.bsr.vis{display:flex}.bsr:active{transform:scale(.97)}
 
 /* SCAN */
 #scan{background:#000}
 .cw{position:relative;flex:1;overflow:hidden}
 #vid{width:100%;height:100%;object-fit:cover}
-.fr{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:88%;aspect-ratio:1.586;border-radius:11px;box-shadow:0 0 0 4000px rgba(0,0,0,.55);border:2px solid rgba(255,255,255,.4)}
-.mg{position:absolute;left:3%;right:3%;bottom:4%;height:34%;border:2px dashed var(--li);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono';font-size:8px;color:var(--li);letter-spacing:.1em;text-align:center;padding:4px;background:rgba(23,232,143,.05)}
-.scb{padding:14px 16px 22px;background:var(--g2);display:flex;flex-direction:column;gap:9px}
-.stx{font-family:'IBM Plex Mono';font-size:10px;color:var(--sa);text-align:center;min-height:14px}.stx.busy{color:var(--wa)}.stx.ok{color:var(--li)}
+.fr{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:88%;aspect-ratio:1.586;border-radius:10px;box-shadow:0 0 0 4000px rgba(0,0,0,.55);border:2px solid rgba(255,255,255,.35)}
+.mg{position:absolute;left:3%;right:3%;bottom:4%;height:32%;border:2px dashed var(--li);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono';font-size:7px;color:var(--li);letter-spacing:.08em;text-align:center;padding:3px;background:rgba(23,232,143,.04)}
+.scb{padding:12px 14px 20px;background:var(--g2);display:flex;flex-direction:column;gap:8px}
+.stx{font-family:'IBM Plex Mono';font-size:9px;color:var(--sa);text-align:center;min-height:12px}.stx.busy{color:var(--wa)}
 
 /* MANUAL */
 #manual{background:linear-gradient(160deg,var(--g),var(--g2));overflow-y:auto}
-.mn{padding:18px 16px 36px;display:flex;flex-direction:column;gap:14px;flex:1}
-.sxr{display:flex;gap:7px}
-.sxb{flex:1;padding:13px;border-radius:9px;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.03);color:var(--sa);font-family:'Archivo';font-weight:700;font-size:14px;cursor:pointer;text-align:center}
-.sxb.on{background:rgba(23,232,143,.18);border-color:var(--li);color:var(--li)}
+.mn{padding:16px 14px 32px;display:flex;flex-direction:column;gap:12px;flex:1}
+.sxr{display:flex;gap:6px}
+.sxb{flex:1;padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:var(--sa);font-family:'Archivo';font-weight:700;font-size:13px;cursor:pointer;text-align:center}.sxb.on{background:rgba(23,232,143,.16);border-color:var(--li);color:var(--li)}
 
 /* VERIFY */
 #verify{background:linear-gradient(160deg,var(--g),var(--g2));overflow-y:auto}
-.vn{padding:16px 16px 36px;display:flex;flex-direction:column;gap:12px;flex:1}
-.vt{display:flex;align-items:center;gap:9px;background:rgba(23,232,143,.08);border:1px solid rgba(23,232,143,.2);padding:10px 12px;border-radius:11px}
-.vt .ic{font-size:18px}.vt p{font-size:11px;color:var(--sa);line-height:1.3}.vt b{color:var(--pa)}
-.dc{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.09);border-radius:var(--r);overflow:hidden}
-.dr{display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.05)}
-.dr:last-child{border-bottom:none}
-.dr .k{font-family:'IBM Plex Mono';font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--li)}
-.dr .v{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:9px;color:#fff;font-family:'Archivo';font-size:16px;font-weight:700;width:100%}
-.dr .v:focus{outline:2px solid var(--li)}
+.vn{padding:14px 14px 32px;display:flex;flex-direction:column;gap:10px;flex:1}
+.vt{display:flex;align-items:center;gap:8px;background:rgba(23,232,143,.07);border:1px solid rgba(23,232,143,.18);padding:9px 11px;border-radius:10px}
+.vt .ic{font-size:16px}.vt p{font-size:10px;color:var(--sa);line-height:1.3}.vt b{color:var(--pa)}
+.dc{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:var(--r);overflow:hidden}
+.dr{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.04)}.dr:last-child{border-bottom:none}
+.dr .k{font-family:'IBM Plex Mono';font-size:7px;letter-spacing:.16em;text-transform:uppercase;color:var(--li)}
+.dr .v{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:8px;color:#fff;font-family:'Archivo';font-size:15px;font-weight:700;width:100%}.dr .v:focus{outline:2px solid var(--li)}
 .dr .v.ro{border-color:transparent;background:rgba(255,255,255,.02);color:var(--sa);font-weight:600}
-textarea.v{resize:vertical;min-height:50px;font-size:13px;font-weight:500;line-height:1.3}
-.bdn{background:var(--li);color:var(--g2);font-size:18px;padding:18px}
-.bdn:disabled{opacity:.4;filter:grayscale(.3)}
+textarea.v{resize:vertical;min-height:44px;font-size:12px;font-weight:500;line-height:1.3}
+.bdn{background:var(--li);color:var(--g2);font-size:17px;padding:17px}
 
-/* CALL + RECORD SECTION */
-.call-sec{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.09);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px}
-.call-row{display:flex;gap:8px}
-.call-row .ip{flex:1}
-.cb{width:46px;height:46px;border:none;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.cb:active{transform:scale(.9)}
-.cb-ph{background:#2196F3;color:#fff}
-.cb-wa{background:#25D366;color:#fff}
-.rec-row{display:flex;align-items:center;gap:8px}
-.rec-btn{padding:10px 16px;border-radius:9px;border:none;font-family:'Archivo';font-weight:800;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px}
-.rec-btn.start{background:var(--da);color:#fff}
-.rec-btn.stop{background:var(--wa);color:var(--g2)}
-.rec-btn:disabled{opacity:.4}
-.rec-time{font-family:'IBM Plex Mono';font-size:11px;color:var(--sa)}
-.rec-dot{width:8px;height:8px;border-radius:50%;background:var(--da);animation:blink 1s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.audio-play{width:100%;margin-top:4px;border-radius:8px}
-.rec-note{font-family:'IBM Plex Mono';font-size:8px;color:rgba(255,255,255,.35)}
+/* CALL */
+.csec{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:var(--r);padding:12px;display:flex;flex-direction:column;gap:8px}
+.cb{width:42px;height:42px;border:none;border-radius:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;background:#2196F3;color:#fff}.cb:active{transform:scale(.9)}
+.rec-info{font-family:'IBM Plex Mono';font-size:9px;color:var(--sa);display:flex;align-items:center;gap:6px}
+.rdot{width:7px;height:7px;border-radius:50%;background:var(--da);animation:bl 1s infinite}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:.2}}
+.audio-play{width:100%;border-radius:6px;margin-top:3px}
+.rec-note{font-family:'IBM Plex Mono';font-size:7px;color:rgba(255,255,255,.3)}
 
 /* RESULT */
-.rs{position:fixed;inset:0;z-index:70;display:none;flex-direction:column;align-items:center;justify-content:center;padding:26px;text-align:center;animation:fd .2s ease}
-.rs.show{display:flex}
-.rs.ok{background:linear-gradient(160deg,#046b3f,#012a1f)}
-.rs.block{background:linear-gradient(160deg,#9e0f24,#5a0712)}
-.rs .bi{font-size:72px;margin-bottom:4px}
-.rs h1{font-size:28px;font-weight:900;line-height:1;margin-bottom:8px}
-.rs p{font-size:14px;color:rgba(255,255,255,.8);max-width:300px;line-height:1.35}
-.rs .wh{font-family:'IBM Plex Mono';font-size:12px;margin-top:10px;background:rgba(255,255,255,.1);padding:9px 14px;border-radius:9px}
-.rs .bt{margin-top:24px;min-width:180px}
-.rs.block .bt{background:#fff;color:#9e0f24}
-.rs.ok .bt{background:var(--li);color:var(--g2)}
+.rs{position:fixed;inset:0;z-index:70;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;animation:fd .2s ease}.rs.show{display:flex}
+.rs.ok{background:linear-gradient(160deg,#046b3f,#012a1f)}.rs.block{background:linear-gradient(160deg,#9e0f24,#5a0712)}
+.rs .bi{font-size:66px;margin-bottom:4px}.rs h1{font-size:26px;font-weight:900;line-height:1;margin-bottom:6px}
+.rs p{font-size:13px;color:rgba(255,255,255,.78);max-width:280px;line-height:1.3}
+.rs .wh{font-family:'IBM Plex Mono';font-size:11px;margin-top:8px;background:rgba(255,255,255,.1);padding:8px 12px;border-radius:8px}
+.rs .bt{margin-top:20px;min-width:160px}
+.rs.block .bt{background:#fff;color:#9e0f24}.rs.ok .bt{background:var(--li);color:var(--g2)}
 
 /* MODALS */
-.mb{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:60;padding:18px}
-.mb.show{display:flex}
-.md{background:var(--g2);border:1px solid rgba(255,255,255,.12);border-radius:var(--r);padding:20px;width:100%;max-width:380px;display:flex;flex-direction:column;gap:10px}
-.md h3{font-size:16px}
-.md label{font-family:'IBM Plex Mono';font-size:9px;color:var(--li);letter-spacing:.14em;text-transform:uppercase}
-.md input{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:#fff;border-radius:9px;padding:12px;font-size:13px;font-family:'IBM Plex Mono';width:100%}
-.md input:focus{outline:2px solid var(--li)}
-.md small{color:rgba(255,255,255,.4);font-size:9px;line-height:1.4}
-.lb{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:9px;font-family:'IBM Plex Mono';font-size:9px;word-break:break-all;color:var(--sa)}
-.em{color:#ff9aa6;font-size:10px;min-height:12px}
-.to{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(120px);background:#fff;color:var(--g2);font-weight:800;padding:12px 20px;border-radius:11px;box-shadow:0 8px 30px rgba(0,0,0,.4);transition:transform .35s cubic-bezier(.2,1.2,.3,1);z-index:80;display:flex;align-items:center;gap:7px;font-size:13px;max-width:88%}
-.to.show{transform:translateX(-50%) translateY(0)}
-.to.err{background:var(--da);color:#fff}
+.mb{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:60;padding:16px;overflow-y:auto}.mb.show{display:flex}
+.md{background:var(--g2);border:1px solid rgba(255,255,255,.1);border-radius:var(--r);padding:18px;width:100%;max-width:400px;display:flex;flex-direction:column;gap:9px;max-height:90vh;overflow-y:auto}
+.md h3{font-size:15px}.md label{font-family:'IBM Plex Mono';font-size:8px;color:var(--li);letter-spacing:.12em;text-transform:uppercase}
+.md input,.md select{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:#fff;border-radius:8px;padding:10px;font-size:12px;font-family:'IBM Plex Mono';width:100%}.md input:focus,.md select:focus{outline:2px solid var(--li)}
+.md small{color:rgba(255,255,255,.35);font-size:8px;line-height:1.3}
+.lb{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:8px;font-family:'IBM Plex Mono';font-size:8px;word-break:break-all;color:var(--sa)}
+.em{color:#ff9aa6;font-size:9px;min-height:11px}
+.clist{max-height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:3px}
+.citem{display:flex;align-items:center;gap:6px;padding:6px 8px;background:rgba(255,255,255,.03);border-radius:6px;font-size:10px}
+.citem .cn{flex:1;font-weight:700}.citem .ct{font-family:'IBM Plex Mono';font-size:9px;color:var(--sa)}.citem .cb2{color:var(--li);font-size:8px}
+.cdel{background:none;border:none;color:var(--da);cursor:pointer;font-size:14px;padding:2px}
+
+/* CALL CONFIRM */
+.cc{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;z-index:65;padding:20px}.cc.show{display:flex}
+.ccb{background:var(--g2);border:1px solid rgba(255,255,255,.12);border-radius:var(--r);padding:22px;width:100%;max-width:360px;text-align:center;display:flex;flex-direction:column;gap:12px}
+.ccb .wi{font-size:40px}.ccb h3{font-size:16px}.ccb p{font-size:12px;color:var(--sa);line-height:1.4}
+
+.to{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(120px);background:#fff;color:var(--g2);font-weight:800;padding:11px 18px;border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.4);transition:transform .35s cubic-bezier(.2,1.2,.3,1);z-index:80;display:flex;align-items:center;gap:6px;font-size:12px;max-width:86%}.to.show{transform:translateX(-50%) translateY(0)}.to.err{background:var(--da);color:#fff}
 </style>
 </head>
 <body>
@@ -150,34 +127,30 @@ textarea.v{resize:vertical;min-height:50px;font-size:13px;font-weight:500;line-h
 
 <!-- HOME -->
 <section id="home" class="sc on">
-<div><span class="bg">Sistema de Registro</span></div>
-<div class="hc">
-<div class="lo">CB<span>RE</span></div><div class="rl"></div>
-<div class="sb"><b>iCenter Sur</b><br>Control de Acceso</div>
-<p class="ds">Registra ingresos por cédula, patente o datos manuales. Graba autorizaciones de voz.</p>
-</div>
+<div><span style="font-family:'IBM Plex Mono';font-size:8px;letter-spacing:.3em;color:var(--li);text-transform:uppercase">Sistema de Registro</span></div>
+<div class="hc"><div class="lo">CB<span>RE</span></div><div class="rl"></div>
+<div style="font-size:18px;font-weight:600;color:var(--sa)"><b style="color:var(--pa);font-weight:800">iCenter Sur</b><br>Control de Acceso</div>
+<p style="font-size:11px;color:rgba(255,255,255,.45);max-width:280px;line-height:1.4">Registra ingresos por cédula, patente o manual. Graba autorizaciones de voz.</p></div>
 <div class="hb">
-<button class="bt bp bw" id="btnGo" onclick="goId()">Ingreso</button>
+<button class="bt bp bw" onclick="goId()">Ingreso</button>
 <button class="bt bg2 bw" onclick="askPass()">Configuración</button>
 <div class="cl"><span id="cfgD" class="dt"></span><span id="cfgT">—</span></div>
-<div id="ocrBar" class="pbar"><div class="fill" id="ocrFill"></div></div>
-<div class="cl" id="ocrTxt">Preparando OCR…</div>
-</div>
-</section>
+<div class="pbar" id="ocrBar"><div class="fill" id="ocrFill"></div></div>
+<div class="cl" id="ocrTxt" style="font-size:7px">Preparando OCR…</div>
+</div></section>
 
 <!-- IDENTIFY -->
 <section id="identify" class="sc">
 <div class="tp"><button class="bk" onclick="goHome()">‹</button><div><h2>Nuevo Ingreso</h2><div class="ts">Identificación</div></div><span class="pl" id="pill">0</span></div>
 <div class="idn">
-<div class="sc2"><div class="st2">Bodega</div>
-<div class="rw"><select class="sl" id="bL" onchange="bodC()"><option value="">N/A</option><option>A</option><option>B</option><option>C</option></select><span class="sp">—</span><input class="ip nb" id="bN" type="number" inputmode="numeric" placeholder="N°" disabled></div></div>
-<div class="sc2"><div class="st2">Patente <span style="opacity:.4;font-weight:400">(opcional)</span></div>
-<div id="pCl"><div class="pr"><input class="ip ism" id="p1" maxlength="2" inputmode="text" autocapitalize="characters" oninput="pA(this,'p2')"><span class="sp">·</span><input class="ip ism" id="p2" maxlength="2" inputmode="text" autocapitalize="characters" oninput="pA(this,'p3')"><span class="sp">·</span><input class="ip ism" id="p3" maxlength="2" inputmode="text" autocapitalize="characters"></div></div>
-<div id="pIn" style="display:none"><input class="ip" id="pI" placeholder="Patente internacional" autocapitalize="characters"></div>
-<span class="lk" id="pTg" onclick="tgPat()">* Patente internacional</span></div>
+<div class="sc2"><div class="st2">Bodega</div><div class="rw"><select class="sl" id="bL" onchange="bodC()"><option value="">N/A</option><option>A</option><option>B</option><option>C</option></select><span class="sp">—</span><input class="ip nb" id="bN" type="number" inputmode="numeric" placeholder="N°" disabled></div></div>
+<div class="sc2"><div class="st2">Patente <span style="opacity:.35;font-weight:400">(opcional)</span></div>
+<div id="pCl"><div class="pr"><input class="ip ism" id="p1" maxlength="2" inputmode="text" autocapitalize="characters" oninput="pA(this,'p2')"><span class="sp">·</span><input class="ip ism" id="p2" maxlength="2" inputmode="text" autocapitalize="characters" oninput="pA(this,'p3')"><span class="sp">·</span><input class="ip ism" id="p3" maxlength="2" inputmode="text" autocapitalize="characters" oninput="ckSr()"></div></div>
+<div id="pIn" style="display:none"><input class="ip" id="pI" placeholder="Patente internacional" autocapitalize="characters" oninput="ckSr()"></div>
+<span class="lk" onclick="tgPat()" id="pTg">* Patente internacional</span></div>
 <div class="sc2"><div class="st2">Identificación</div>
-<button class="sbig" id="btnScan" onclick="goScan()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2"/><line x1="7" y1="12" x2="17" y2="12"/></svg>Escanear Cédula</button>
-<button class="bt bg2 bw" style="margin-top:8px" onclick="goMan()">Ingreso Manual</button></div>
+<button class="sbig" id="btnScan" onclick="goScan()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2"/><line x1="7" y1="12" x2="17" y2="12"/></svg>Escanear Cédula</button>
+<button class="bt bg2 bw" style="margin-top:6px" onclick="goMan()">Ingreso Manual</button></div>
 <div class="orl">— o busca por patente —</div>
 <button class="bsr" id="btnSr" onclick="srPat()">Buscar por patente</button>
 </div></section>
@@ -194,14 +167,14 @@ textarea.v{resize:vertical;min-height:50px;font-size:13px;font-weight:500;line-h
 <div class="mn">
 <div class="sc2"><div class="st2">RUN</div><input class="ip" id="mR" placeholder="12.345.678-9"></div>
 <div class="sc2"><div class="st2">Nombre completo</div><input class="ip" id="mN" placeholder="Nombre y apellidos" autocapitalize="words"></div>
-<div class="sc2"><div class="st2">Sexo</div><div class="sxr"><div class="sxb" onclick="pSx(this,'Masculino')">Masculino</div><div class="sxb" onclick="pSx(this,'Femenino')">Femenino</div></div></div>
+<div class="sc2"><div class="st2">Sexo</div><div class="sxr"><div class="sxb" onclick="pSx(this,'M')">Masculino</div><div class="sxb" onclick="pSx(this,'F')">Femenino</div></div></div>
 <button class="bt bp bw" style="margin-top:auto" onclick="mCont()">Continuar</button></div></section>
 
 <!-- VERIFY -->
 <section id="verify" class="sc">
 <div class="tp"><button class="bk" onclick="goId2()">‹</button><div><h2>Verificar datos</h2><div class="ts">Confirma y registra</div></div></div>
 <div class="vn">
-<div class="vt"><span class="ic">👁️</span><p>Verifica <b>visualmente</b>. Edita si es necesario.</p></div>
+<div class="vt"><span class="ic">👁️</span><p>Verifica <b>visualmente</b>. Edita si necesario.</p></div>
 <div class="dc">
 <div class="dr"><span class="k">RUN</span><input class="v" id="vR"></div>
 <div class="dr"><span class="k">Nombre</span><input class="v" id="vN"></div>
@@ -211,20 +184,13 @@ textarea.v{resize:vertical;min-height:50px;font-size:13px;font-weight:500;line-h
 <div class="dr"><span class="k">Patente</span><input class="v ro" id="vP" readonly></div>
 <div class="dr"><span class="k">Observaciones</span><textarea class="v" id="vO" placeholder="Proveedor, visita, empresa…"></textarea></div>
 </div>
-<!-- CALL + RECORD -->
-<div class="call-sec">
+<div class="csec">
 <div class="st2">Contacto / Autorización de voz</div>
-<div class="call-row">
-<input class="ip" id="cPh" placeholder="Teléfono bodega" inputmode="tel">
-<button class="cb cb-ph" onclick="doCall()" title="Llamar">📞</button>
-<button class="cb cb-wa" onclick="doWA()" title="WhatsApp">💬</button>
-</div>
-<div class="rec-row">
-<button class="rec-btn start" id="recBtn" onclick="tgRec()"><span id="recIc">🎙</span> <span id="recLbl">Grabar memo</span></button>
-<span class="rec-time" id="recTime"></span>
-</div>
+<div class="rw"><select class="sl" id="cSel" onchange="cSelCh()" style="flex:1"><option value="">— Seleccionar contacto —</option></select></div>
+<div class="rw"><input class="ip" id="cPh" placeholder="Teléfono" inputmode="tel" style="flex:1"><button class="cb" onclick="initCall()">📞</button></div>
+<div class="rec-info" id="recInfo" style="display:none"><span class="rdot"></span><span id="recTime">0s</span><span>grabando…</span><button class="bt bda" style="padding:6px 12px;font-size:11px" onclick="stopRec()">Detener grabación</button></div>
 <div id="recPlay"></div>
-<p class="rec-note">Graba la autorización verbal. El audio se adjunta al registro.</p>
+<p class="rec-note">Al llamar se inicia grabación automática. El audio queda en el registro.</p>
 </div>
 <button class="bt bdn bw" id="btnD" onclick="save()">✓ Realizado — Registrar</button>
 <button class="bt bg2 bw" onclick="goId2()">Volver</button>
@@ -236,73 +202,98 @@ textarea.v{resize:vertical;min-height:50px;font-size:13px;font-weight:500;line-h
 <!-- RESULT -->
 <div class="rs" id="res"><div class="bi" id="rI">✓</div><h1 id="rT">OK</h1><p id="rM"></p><div class="wh" id="rW"></div><button class="bt" onclick="clRes()">Continuar</button></div>
 
+<!-- CALL CONFIRM -->
+<div class="cc" id="callC"><div class="ccb"><div class="wi">📞</div><h3>Llamada con grabación</h3><p>Se iniciará la grabación de audio por seguridad. Al aceptar se abrirá la llamada y se grabará hasta que vuelvas a la app.</p><p id="ccTo" style="font-weight:700;color:var(--li)"></p><button class="bt bp bw" onclick="confirmCall()">Aceptar y llamar</button><button class="bt bg2 bw" onclick="cancelCall()">Cancelar</button></div></div>
+
 <!-- PASS -->
 <div class="mb" id="pMod"><div class="md"><h3>Configuración</h3><label>Contraseña</label><input id="pIn2" type="password" inputmode="numeric" placeholder="••••••••"><div class="em" id="pEr"></div><button class="bt bp" onclick="ckP()">Entrar</button><button class="bt bg2" onclick="clP()">Cancelar</button></div></div>
+
 <!-- CFG -->
-<div class="mb" id="cMod"><div class="md"><h3>Conexión</h3><label>Link actual</label><div class="lb" id="cLk">—</div><label>Nuevo link</label><input id="cIn" placeholder="https://script.google.com/.../exec"><button class="bt bp" onclick="svLk()">Guardar</button><button class="bt bg2" onclick="clLk()">Eliminar</button><button class="bt bg2" onclick="clC()">Cerrar</button></div></div>
+<div class="mb" id="cMod"><div class="md" style="gap:8px">
+<h3>Conexión</h3><label>Link actual</label><div class="lb" id="cLk">—</div>
+<label>Nuevo link</label><input id="cIn" placeholder="https://script.google.com/.../exec">
+<button class="bt bp" style="padding:10px" onclick="svLk()">Guardar link</button>
+<button class="bt bg2" style="padding:8px;font-size:11px" onclick="testEp()">Probar conexión</button>
+<div class="em" id="testRes"></div>
+<hr style="border-color:rgba(255,255,255,.08)">
+<h3>Contactos de bodegas</h3>
+<div class="rw"><select class="sl" id="cfBod" style="flex:1" onchange="cfBodCh()"><option value="">Bodega…</option><option>A</option><option>B</option><option>C</option></select><span class="sp">—</span><input class="ip nb" id="cfBodN" placeholder="N°" style="width:50px"></div>
+<button class="bt bg2" style="padding:8px;font-size:11px" onclick="cfFilter()">Ver contactos</button>
+<div class="clist" id="cfList"></div>
+<label style="margin-top:4px">Agregar contacto</label>
+<input id="cfNom" placeholder="Nombre"><input id="cfTel" placeholder="Teléfono" inputmode="tel">
+<button class="bt bp" style="padding:8px;font-size:11px" onclick="cfAdd()">+ Agregar</button>
+<hr style="border-color:rgba(255,255,255,.08)">
+<label>Importar desde Excel</label>
+<small>Archivo .xlsx con columnas: A=Bodega, B=Nombre, C=Teléfono</small>
+<input type="file" id="cfFile" accept=".xlsx,.xls" onchange="cfImport(this)" style="font-size:10px">
+<button class="bt bg2" style="padding:8px;font-size:11px" onclick="cfClearAll()">Eliminar todos los contactos</button>
+<hr style="border-color:rgba(255,255,255,.08)">
+<button class="bt bg2" onclick="clC()">Cerrar</button>
+</div></div>
+
 <div class="to" id="to"><span id="tI">✓</span><span id="tM"></span></div>
 
 <script>
-const DE="https://script.google.com/macros/s/AKfycbwmrMncewmLmKRmM55Wj3AnehTaXeNOz3SEnvucxXkr5MiRpnS_jBptD9w1c-LW7ONrLw/exec";           // DEFAULT_ENDPOINT — pega tu /exec aquí
-const CP="123456789";  // CONFIG_PASSWORD
+/* ==================== CONFIGURACIÓN ==================== */
+const DE = "";  // PEGA TU /exec AQUÍ
+const CP = "123456789";
+/* ======================================================= */
 
-const S={ep:"",ct:0,str:null,oW:null,oReady:false,ov:null,iP:false,mSx:"",
-  rec:null,recChunks:[],recTimer:null,recSec:0,audioBlob:null,audioUrl:null};
+/* STATE */
+const S = {
+  ov:null, ct:0, str:null, oW:null, oReady:false, iP:false, mSx:"",
+  rec:null, chunks:[], rTimer:null, rSec:0, aBlob:null, aUrl:null,
+  contacts:[], callPh:"", callName:""
+};
 function ep(){return S.ov||DE||""}
 
 /* NAV */
 function sh(id){document.querySelectorAll('.sc').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on')}
 function goHome(){stopC();sh('home')}
-function goId(){sh('identify');ckSr()}
-function goId2(){stopC();sh('identify');ckSr()}
-async function goScan(){if(!S.oReady){toast('OCR aún cargando, usa ingreso manual','!',true);return}sh('scan');await stCam()}
+function goId(){sh('identify');ckSr();fillContactSel()}
+function goId2(){stopC();sh('identify');ckSr();fillContactSel()}
+async function goScan(){if(!S.oReady){toast('OCR cargando, usa manual','!',1);return}sh('scan');await stCam()}
 function goMan(){sh('manual');S.mSx='';document.querySelectorAll('.sxb').forEach(b=>b.classList.remove('on'))}
 
-/* BOD */
-function bodC(){const l=document.getElementById('bL').value,n=document.getElementById('bN');n.disabled=!l;if(!l)n.value=''}
-function gBod(){const l=document.getElementById('bL').value,n=document.getElementById('bN').value;return l?(l+(n?'-'+n:'')):'';}
-function bVal(){const l=document.getElementById('bL').value,n=document.getElementById('bN').value;if(l&&!n){toast('Indica N° de bodega','!',true);return false}return true}
+/* BODEGA */
+function bodC(){const l=$('bL').value,n=$('bN');n.disabled=!l;if(!l)n.value=''}
+function gBod(){const l=$('bL').value,n=$('bN').value;return l?(l+(n?'-'+n:'')):'';}
+function bVal(){const l=$('bL').value,n=$('bN').value;if(l&&!n){toast('N° de bodega','!',1);return false}return true}
+function normBod(s){return String(s||'').toUpperCase().replace(/\s/g,'').replace(/^([ABC])-?0*(\d+)$/,'$1-$2')}
 
-/* PAT */
-function pA(el,nx){el.value=el.value.toUpperCase().replace(/[^A-Z0-9]/g,'');if(el.value.length>=2){const n=document.getElementById(nx);if(n)n.focus()}ckSr()}
-function tgPat(){S.iP=!S.iP;document.getElementById('pCl').style.display=S.iP?'none':'block';document.getElementById('pIn').style.display=S.iP?'block':'none';document.getElementById('pTg').textContent=S.iP?'* Patente chilena':'* Patente internacional';ckSr()}
-function gPat(){if(S.iP)return document.getElementById('pI').value.trim().toUpperCase();const a=document.getElementById('p1').value,b=document.getElementById('p2').value,c=document.getElementById('p3').value;return(a||b||c)?(a+b+c).toUpperCase():'';}
-function ckSr(){document.getElementById('btnSr').classList.toggle('vis',gPat().length>=4)}
-['p1','p2','p3','pI'].forEach(id=>{const e=document.getElementById(id);if(e)e.addEventListener('input',ckSr)});
+/* PATENTE */
+function pA(el,nx){el.value=el.value.toUpperCase().replace(/[^A-Z0-9]/g,'');if(el.value.length>=2){const n=$(nx);if(n)n.focus()}ckSr()}
+function tgPat(){S.iP=!S.iP;$('pCl').style.display=S.iP?'none':'block';$('pIn').style.display=S.iP?'block':'none';$('pTg').textContent=S.iP?'* Patente chilena':'* Patente internacional';ckSr()}
+function gPat(){if(S.iP)return $('pI').value.trim().toUpperCase();const a=$('p1').value,b=$('p2').value,c=$('p3').value;return(a||b||c)?(a+b+c).toUpperCase():'';}
+function ckSr(){$('btnSr').classList.toggle('vis',gPat().length>=4)}
 
 /* SEARCH PLATE */
-async function srPat(){if(!bVal())return;const p=gPat();if(p.length<4){toast('Patente incompleta','!',true);return}
-if(!ep()){toast('Configure link primero','!',true);return}
+async function srPat(){if(!bVal())return;const p=gPat();if(p.length<4){toast('Patente incompleta','!',1);return}
+if(!ep()){toast('Configure link','!',1);return}
 try{const r=await fetch(ep()+'?action=searchPlate&patente='+encodeURIComponent(p));const d=await r.json();
 if(d.found){fV({run:d.run||'',nombre:d.nombre||'',sexo:d.sexo||'',empresa:d.empresa||''});sh('verify')}
-else toast('Patente no encontrada','!',true)}catch(e){toast('Error: '+e.message,'!',true)}}
+else toast('No encontrada','!',1)}catch(e){toast('Error: '+e.message,'!',1)}}
 
-/* SEX */
 function pSx(el,v){S.mSx=v;document.querySelectorAll('.sxb').forEach(b=>b.classList.remove('on'));el.classList.add('on')}
-
-/* MANUAL */
-function mCont(){const r=document.getElementById('mR').value.trim(),n=document.getElementById('mN').value.trim();
-if(!r&&!n){toast('Ingresa RUN o nombre','!',true);return}if(!bVal())return;fV({run:r,nombre:n,sexo:S.mSx});sh('verify')}
+function mCont(){const r=$('mR').value.trim(),n=$('mN').value.trim();if(!r&&!n){toast('Ingresa RUN o nombre','!',1);return}if(!bVal())return;fV({run:r,nombre:n,sexo:S.mSx==='M'?'Masculino':'Femenino'});sh('verify')}
 
 /* CAMERA */
-async function stCam(){const v=document.getElementById('vid');sSt('Iniciando cámara…','busy');
+async function stCam(){const v=$('vid');sSt('Iniciando…','busy');
 try{if(S.str)stopC();S.str=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false});v.srcObject=S.str;await v.play();sSt('Alinea y captura','')}catch(e){sSt('Error: '+e.message,'busy')}}
 function stopC(){if(S.str){S.str.getTracks().forEach(t=>t.stop());S.str=null}}
 
-/* OCR CAPTURE */
-async function cap(){const v=document.getElementById('vid');if(!v.videoWidth){sSt('Cámara no lista','busy');return}
-if(!S.oReady||!S.oW){sSt('OCR no disponible','busy');return}
+/* OCR */
+async function cap(){const v=$('vid');if(!v.videoWidth||!S.oReady||!S.oW){sSt('OCR no listo','busy');return}
 sSt('Leyendo MRZ…','busy');
 const vw=v.videoWidth,vh=v.videoHeight,c=document.createElement('canvas');
 const cy=Math.floor(vh*.48),ch=Math.floor(vh*.50),cx=Math.floor(vw*.03),cw=Math.floor(vw*.94);
-c.width=cw;c.height=ch;const ctx=c.getContext('2d');
-ctx.drawImage(v,cx,cy,cw,ch,0,0,cw,ch);
+c.width=cw;c.height=ch;const ctx=c.getContext('2d');ctx.drawImage(v,cx,cy,cw,ch,0,0,cw,ch);
 const img=ctx.getImageData(0,0,cw,ch),d=img.data;
 for(let i=0;i<d.length;i+=4){let g=.299*d[i]+.587*d[i+1]+.114*d[i+2];g=g>128?255:(g<88?0:g);d[i]=d[i+1]=d[i+2]=g}
 ctx.putImageData(img,0,0);
 try{const{data}=await S.oW.recognize(c);const p=parseTD1(data.text);
-if(p){if(!bVal())return;fV(p);stopC();sh('verify')}
-else sSt('MRZ no detectada. Acerca y reintenta.','busy')}catch(e){sSt('Error: '+e.message,'busy')}}
+if(p){if(!bVal())return;fV(p);stopC();sh('verify')}else sSt('MRZ no detectada. Reintenta.','busy')}catch(e){sSt('Error: '+e.message,'busy')}}
 
 /* TD1 PARSER */
 function parseTD1(raw){
@@ -317,111 +308,158 @@ if(!lN){for(const l of ls){if(l!==lD&&l!==lC){const t=cL(l);if(t>bN){bN=t;lN=l}}
 const r={run:'',nombre:'',sexo:''};
 if(lN){const p=lN.split('<<');r.nombre=((p[1]||'').replace(/</g,' ').trim()+' '+(p[0]||'').replace(/</g,' ').trim()).replace(/\s+/g,' ').trim()}
 if(lD){const sx=lD.match(/\d([MF])\d/);if(sx)r.sexo=sx[1]==='M'?'Masculino':'Femenino';
-const i=lD.indexOf('CHL');if(i!==-1){const rest=lD.slice(i+3),cut=rest.indexOf('<');let b='',d='';
-if(cut!==-1){b=rest.slice(0,cut).replace(/[^0-9K]/g,'');const af=rest.slice(cut).replace(/</g,'');d=(af.charAt(0)||'').replace(/[^0-9K]/g,'')}
-else{const m=rest.match(/(\d{7,8})([0-9K])/);if(m){b=m[1];d=m[2]}}
-if(b&&d)r.run=fR(b,d)}}
+const i=lD.indexOf('CHL');if(i!==-1){const rest=lD.slice(i+3),cut=rest.indexOf('<');let b='',dv='';
+if(cut!==-1){b=rest.slice(0,cut).replace(/[^0-9K]/g,'');const af=rest.slice(cut).replace(/</g,'');dv=(af.charAt(0)||'').replace(/[^0-9K]/g,'')}
+else{const m=rest.match(/(\d{7,8})([0-9K])/);if(m){b=m[1];dv=m[2]}}
+if(b&&dv)r.run=fmtR(b,dv)}}
 return(!r.nombre&&!r.run)?null:r}
-function fR(b,d){let c=b.split('').reverse().join(''),o='';for(let i=0;i<c.length;i++){o+=c[i];if((i+1)%3===0&&i!==c.length-1)o+='.'}return o.split('').reverse().join('')+'-'+d}
+function fmtR(b,d){let c=b.split('').reverse().join(''),o='';for(let i=0;i<c.length;i++){o+=c[i];if((i+1)%3===0&&i!==c.length-1)o+='.'}return o.split('').reverse().join('')+'-'+d}
 
 /* FILL VERIFY */
-function fV(p){document.getElementById('vR').value=p.run||'';document.getElementById('vN').value=p.nombre||'';
-document.getElementById('vS').value=p.sexo||'';document.getElementById('vE').value=p.empresa||'';
-document.getElementById('vB').value=gBod();document.getElementById('vP').value=gPat();
-document.getElementById('vO').value='';document.getElementById('cPh').value='';
-S.audioBlob=null;S.audioUrl=null;document.getElementById('recPlay').innerHTML=''}
+function fV(p){$('vR').value=p.run||'';$('vN').value=p.nombre||'';$('vS').value=p.sexo||'';$('vE').value=p.empresa||'';
+$('vB').value=gBod();$('vP').value=gPat();$('vO').value='';$('cPh').value='';
+S.aBlob=null;S.aUrl=null;$('recPlay').innerHTML='';$('recInfo').style.display='none';
+fillContactSel()}
 
-/* CALL / WHATSAPP */
-function doCall(){const n=document.getElementById('cPh').value.trim().replace(/\s/g,'');
-if(!n){toast('Ingresa teléfono','!',true);return}window.open('tel:'+n,'_blank')}
-function doWA(){const n=document.getElementById('cPh').value.trim().replace(/\s/g,'').replace(/^\+/,'');
-if(!n){toast('Ingresa teléfono','!',true);return}window.open('https://wa.me/'+n,'_blank')}
+/* CONTACTS */
+function loadContacts(){try{const s=localStorage.getItem('ca_contacts');S.contacts=s?JSON.parse(s):[]}catch(e){S.contacts=[]}}
+function saveContacts(){try{localStorage.setItem('ca_contacts',JSON.stringify(S.contacts))}catch(e){}}
+function fillContactSel(){
+  const sel=$('cSel'),bod=normBod(gBod());sel.innerHTML='<option value="">— Seleccionar contacto —</option>';
+  if(!bod){sel.innerHTML+='<option disabled>Selecciona bodega primero</option>';return}
+  const filtered=S.contacts.filter(c=>normBod(c.bodega)===bod);
+  if(!filtered.length){sel.innerHTML+='<option disabled>Sin contactos para '+bod+'</option>';return}
+  filtered.forEach((c,i)=>{const o=document.createElement('option');o.value=JSON.stringify(c);o.textContent=c.nombre+' — '+c.tel;sel.appendChild(o)})}
+function cSelCh(){const v=$('cSel').value;if(!v)return;try{const c=JSON.parse(v);$('cPh').value=c.tel||'';S.callName=c.nombre||''}catch(e){}}
 
-/* VOICE RECORDER */
-function tgRec(){if(!S.rec||S.rec.state==='inactive')startRec();else stopRec()}
-async function startRec(){
+/* CALL + RECORD */
+function initCall(){const ph=$('cPh').value.trim().replace(/\s/g,'');
+if(!ph){toast('Ingresa teléfono','!',1);return}
+S.callPh=ph;$('ccTo').textContent=S.callName?S.callName+' ('+ph+')':ph;
+$('callC').classList.add('show')}
+function cancelCall(){$('callC').classList.remove('show')}
+async function confirmCall(){
+$('callC').classList.remove('show');
 try{const stream=await navigator.mediaDevices.getUserMedia({audio:true});
-S.recChunks=[];S.rec=new MediaRecorder(stream,{mimeType:MediaRecorder.isTypeSupported('audio/webm;codecs=opus')?'audio/webm;codecs=opus':'audio/webm'});
-S.rec.ondataavailable=e=>{if(e.data.size>0)S.recChunks.push(e.data)};
+S.chunks=[];S.rec=new MediaRecorder(stream,{mimeType:MediaRecorder.isTypeSupported('audio/webm;codecs=opus')?'audio/webm;codecs=opus':'audio/webm'});
+S.rec.ondataavailable=e=>{if(e.data.size>0)S.chunks.push(e.data)};
 S.rec.onstop=()=>{stream.getTracks().forEach(t=>t.stop());
-S.audioBlob=new Blob(S.recChunks,{type:'audio/webm'});S.audioUrl=URL.createObjectURL(S.audioBlob);
-document.getElementById('recPlay').innerHTML='<audio controls class="audio-play" src="'+S.audioUrl+'"></audio>';
-updRecUI(false)};
-S.rec.start();S.recSec=0;S.recTimer=setInterval(()=>{S.recSec++;document.getElementById('recTime').innerHTML='<span class="rec-dot"></span> '+S.recSec+'s'},1000);
-updRecUI(true)}catch(e){toast('No se pudo acceder al micrófono','!',true)}}
-function stopRec(){if(S.rec&&S.rec.state==='recording'){S.rec.stop();clearInterval(S.recTimer)}}
-function updRecUI(recording){const btn=document.getElementById('recBtn'),lbl=document.getElementById('recLbl'),ic=document.getElementById('recIc');
-if(recording){btn.className='rec-btn stop';lbl.textContent='Detener';ic.textContent='⏹'}
-else{btn.className='rec-btn start';lbl.textContent='Grabar memo';ic.textContent='🎙';document.getElementById('recTime').textContent=''}}
+S.aBlob=new Blob(S.chunks,{type:'audio/webm'});S.aUrl=URL.createObjectURL(S.aBlob);
+$('recPlay').innerHTML='<audio controls class="audio-play" src="'+S.aUrl+'"></audio>';
+$('recInfo').style.display='none'};
+S.rec.start();S.rSec=0;S.rTimer=setInterval(()=>{S.rSec++;$('recTime').textContent=S.rSec+'s'},1000);
+$('recInfo').style.display='flex';$('recPlay').innerHTML=''}catch(e){toast('Error micrófono','!',1)}
+setTimeout(()=>window.open('tel:'+S.callPh,'_self'),500)}
+function stopRec(){if(S.rec&&S.rec.state==='recording'){S.rec.stop();clearInterval(S.rTimer)}}
+
+/* Page Visibility: auto-stop when user returns */
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'&&S.rec&&S.rec.state==='recording'){
+    setTimeout(()=>{if(S.rec&&S.rec.state==='recording')stopRec()},1500)}});
 
 /* SAVE */
 async function save(){
-const rec={run:document.getElementById('vR').value.trim(),nombre:document.getElementById('vN').value.trim(),
-sexo:document.getElementById('vS').value.trim(),bodega:document.getElementById('vB').value.trim(),
-patente:document.getElementById('vP').value.trim(),observaciones:document.getElementById('vO').value.trim(),
-hora:new Date().toLocaleString('es-CL',{dateStyle:'short',timeStyle:'medium'}),
-tieneAudio:S.audioBlob?'SI':'NO'};
-const btn=document.getElementById('btnD');btn.disabled=true;btn.textContent='Registrando…';
-if(!ep()){btn.disabled=false;btn.textContent='✓ Realizado — Registrar';toast('Configure link','!',true);return}
+if(S.rec&&S.rec.state==='recording')stopRec();
+await new Promise(r=>setTimeout(r,300));
+const now=new Date();
+const hora=now.toLocaleString('es-CL',{dateStyle:'short',timeStyle:'medium'});
+const fname=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())+'_'+pad(now.getHours())+'-'+pad(now.getMinutes())+'-'+pad(now.getSeconds())+'_'+(($('vR').value||'sin-run').replace(/[^0-9K]/gi,''))+'.webm';
+const rec={action:'register',run:$('vR').value.trim(),nombre:$('vN').value.trim(),sexo:$('vS').value.trim(),
+bodega:$('vB').value.trim(),patente:$('vP').value.trim(),observaciones:$('vO').value.trim(),
+hora:hora,tieneAudio:S.aBlob?'SI':'NO',contacto:S.callName||''};
+const btn=$('btnD');btn.disabled=true;btn.textContent='Registrando…';
+if(!ep()){btn.disabled=false;btn.textContent='✓ Realizado — Registrar';toast('Configure link','!',1);return}
 let resp=null,err='';
-try{const url=ep()+'?action=register&'+new URLSearchParams(rec).toString();
+try{const url=ep()+'?'+new URLSearchParams(rec).toString();
 const r=await fetch(url,{method:'GET',redirect:'follow'});const txt=await r.text();
-try{resp=JSON.parse(txt)}catch(pe){err='Resp no JSON: '+txt.slice(0,80)}}catch(e){err=e.message}
-// Upload audio if exists
-if(S.audioBlob&&resp&&resp.ok){
-try{const b64=await blobTo64(S.audioBlob);
-await fetch(ep(),{method:'POST',headers:{'Content-Type':'text/plain'},
-body:JSON.stringify({action:'uploadAudio',run:rec.run,nombre:rec.nombre,hora:rec.hora,audio:b64})})}catch(e){}}
-S.ct++;document.getElementById('pill').textContent=S.ct;
+try{resp=JSON.parse(txt)}catch(pe){err=txt.slice(0,100)}}catch(e){err=e.message}
+if(S.aBlob&&resp&&resp.ok){
+try{const b64=await blob64(S.aBlob);
+await fetch(ep(),{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'uploadAudio',audio:b64,filename:fname})})}catch(e){}}
+S.ct++;$('pill').textContent=S.ct;
 btn.disabled=false;btn.textContent='✓ Realizado — Registrar';
-if(resp){resp.blocked?showR('block',rec,resp):showR('ok',rec,resp)}
-else toast('Error: '+(err||'?'),'!',true)}
-function blobTo64(blob){return new Promise((res,rej)=>{const r=new FileReader();r.onloadend=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(blob)})}
+if(resp&&resp.ok!==undefined){resp.blocked?showR('block',rec,resp):showR('ok',rec,resp)}
+else toast('Error: '+(err||'sin respuesta'),'!',1)}
+function pad(n){return n<10?'0'+n:''+n}
+function blob64(b){return new Promise((r,j)=>{const f=new FileReader();f.onloadend=()=>r(f.result.split(',')[1]);f.onerror=j;f.readAsDataURL(b)})}
 
 /* RESULT */
-function showR(t,rec,resp){const el=document.getElementById('res');el.className='rs show '+t;
-if(t==='block'){document.getElementById('rI').textContent='⛔';document.getElementById('rT').textContent='PROHIBICIÓN DE INGRESO';document.getElementById('rM').textContent='Persona en lista de prohibidos.'}
-else{document.getElementById('rI').textContent='✓';document.getElementById('rT').textContent='Ingreso Registrado';document.getElementById('rM').textContent=resp.empresa?'Empresa: '+resp.empresa:'Sin empresa asignada.'}
-document.getElementById('rW').textContent=(rec.nombre||'')+' · '+(rec.run||'')}
-function clRes(){document.getElementById('res').classList.remove('show');goId();clFlds()}
-function clFlds(){['p1','p2','p3','pI','mR','mN'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=''});
-document.querySelectorAll('.sxb').forEach(b=>b.classList.remove('on'));S.mSx='';S.audioBlob=null;S.audioUrl=null;ckSr()}
+function showR(t,rec,resp){const el=$('res');el.className='rs show '+t;
+if(t==='block'){$('rI').textContent='⛔';$('rT').textContent='PROHIBICIÓN DE INGRESO';$('rM').textContent='Persona en lista de prohibidos.'}
+else{$('rI').textContent='✓';$('rT').textContent='Ingreso Registrado';$('rM').textContent=resp.empresa?'Empresa: '+resp.empresa:'Sin empresa asignada.'}
+$('rW').textContent=(rec.nombre||'')+' · '+(rec.run||'')}
+function clRes(){$('res').classList.remove('show');goId();clFlds()}
+function clFlds(){['p1','p2','p3','pI','mR','mN'].forEach(id=>{const e=$(id);if(e)e.value=''});
+document.querySelectorAll('.sxb').forEach(b=>b.classList.remove('on'));S.mSx='';S.aBlob=null;S.aUrl=null;S.callName='';ckSr()}
 
 /* CONFIG */
-function askPass(){document.getElementById('pIn2').value='';document.getElementById('pEr').textContent='';document.getElementById('pMod').classList.add('show')}
-function clP(){document.getElementById('pMod').classList.remove('show')}
-function ckP(){if(document.getElementById('pIn2').value===CP){clP();opC()}else document.getElementById('pEr').textContent='Incorrecta'}
-function opC(){document.getElementById('cLk').textContent=ep()||'No configurado';document.getElementById('cIn').value='';document.getElementById('cMod').classList.add('show')}
-function clC(){document.getElementById('cMod').classList.remove('show')}
-function svLk(){const v=document.getElementById('cIn').value.trim();if(v){S.ov=v;try{localStorage.setItem('ca_ep',v)}catch(e){}}clC();rCfg()}
-function clLk(){S.ov=null;try{localStorage.removeItem('ca_ep')}catch(e){}clC();rCfg()}
-function rCfg(){const d=document.getElementById('cfgD'),t=document.getElementById('cfgT');
-if(ep()){d.classList.add('ok');t.textContent='Conectado'}else{d.classList.remove('ok');t.textContent='Sin conexión'}}
+function askPass(){$('pIn2').value='';$('pEr').textContent='';$('pMod').classList.add('show')}
+function clP(){$('pMod').classList.remove('show')}
+function ckP(){if($('pIn2').value===CP){clP();opC()}else $('pEr').textContent='Incorrecta'}
+function opC(){$('cLk').textContent=ep()||'No configurado';$('cIn').value='';$('testRes').textContent='';cfFilter();$('cMod').classList.add('show')}
+function clC(){$('cMod').classList.remove('show')}
+function svLk(){const v=$('cIn').value.trim();if(v){S.ov=v;try{localStorage.setItem('ca_ep',v)}catch(e){}}clC();rCfg();toast('Link guardado','✓',0)}
+function rCfg(){const d=$('cfgD'),t=$('cfgT');if(ep()){d.classList.add('ok');t.textContent='Conectado'}else{d.classList.remove('ok');t.textContent='Sin conexión'}}
+async function testEp(){
+  const u=($('cIn').value.trim()||ep());if(!u){$('testRes').textContent='Sin link';return}
+  $('testRes').textContent='Probando…';$('testRes').style.color='var(--wa)';
+  try{const r=await fetch(u+'?action=test');const d=await r.json();
+  if(d.ok&&d.version){$('testRes').textContent='✓ Conectado ('+d.version+')';$('testRes').style.color='var(--li)'}
+  else{$('testRes').textContent='Respuesta inesperada: '+JSON.stringify(d).slice(0,80);$('testRes').style.color='var(--da)'}}
+  catch(e){$('testRes').textContent='Error: '+e.message;$('testRes').style.color='var(--da)'}}
+
+/* CONTACT MANAGEMENT */
+function cfFilter(){
+  const bod=normBod(($('cfBod').value||'')+'-'+($('cfBodN').value||''));
+  const list=$('cfList');list.innerHTML='';
+  const filtered=bod?S.contacts.filter(c=>normBod(c.bodega)===bod):S.contacts;
+  if(!filtered.length){list.innerHTML='<div style="font-size:9px;color:var(--sa);padding:6px">Sin contactos'+(bod?' para '+bod:'')+'</div>';return}
+  filtered.forEach((c,i)=>{
+    const idx=S.contacts.indexOf(c);
+    const d=document.createElement('div');d.className='citem';
+    d.innerHTML='<span class="cb2">'+c.bodega+'</span><span class="cn">'+c.nombre+'</span><span class="ct">'+c.tel+'</span><button class="cdel" onclick="cfDel('+idx+')">✕</button>';
+    list.appendChild(d)})}
+function cfBodCh(){cfFilter()}
+function cfAdd(){
+  const bod=($('cfBod').value||'')+'-'+($('cfBodN').value||'');
+  const nom=$('cfNom').value.trim(),tel=$('cfTel').value.trim();
+  if(!bod||!nom||!tel){toast('Completa bodega, nombre y teléfono','!',1);return}
+  S.contacts.push({bodega:bod.toUpperCase(),nombre:nom,tel:tel});saveContacts();cfFilter();
+  $('cfNom').value='';$('cfTel').value='';toast('Contacto agregado','✓',0)}
+function cfDel(i){S.contacts.splice(i,1);saveContacts();cfFilter()}
+function cfClearAll(){if(confirm('¿Eliminar todos los contactos?')){S.contacts=[];saveContacts();cfFilter();toast('Contactos eliminados','✓',0)}}
+function cfImport(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();reader.onload=e=>{
+    try{const wb=XLSX.read(e.target.result,{type:'array'});
+    const ws=wb.Sheets[wb.SheetNames[0]];const rows=XLSX.utils.sheet_to_json(ws,{header:1});
+    let added=0;rows.forEach(r=>{
+      if(r.length>=3&&r[0]&&r[1]&&r[2]){
+        const bod=String(r[0]).trim().toUpperCase(),nom=String(r[1]).trim(),tel=String(r[2]).trim();
+        if(bod&&nom&&tel){S.contacts.push({bodega:bod,nombre:nom,tel:tel});added++}}});
+    saveContacts();cfFilter();toast(added+' contactos importados','✓',0)}
+    catch(e){toast('Error leyendo Excel','!',1)}};
+  reader.readAsArrayBuffer(file);input.value=''}
 
 /* HELPERS */
-function sSt(t,c){const s=document.getElementById('sSt');s.textContent=t;s.className='stx '+(c||'')}
-function toast(m,i,e){const t=document.getElementById('to');document.getElementById('tM').textContent=m;document.getElementById('tI').textContent=i;t.className='to show'+(e?' err':'');setTimeout(()=>t.classList.remove('show'),2600)}
+function $(id){return document.getElementById(id)}
+function sSt(t,c){const s=$('sSt');s.textContent=t;s.className='stx '+(c||'')}
+function toast(m,i,e){const t=$('to');$('tM').textContent=m;$('tI').textContent=i;t.className='to show'+(e?' err':'');setTimeout(()=>t.classList.remove('show'),2400)}
 
 /* PRE-LOAD OCR */
 async function preloadOCR(){
-const fill=document.getElementById('ocrFill'),txt=document.getElementById('ocrTxt'),btn=document.getElementById('btnScan');
-fill.style.width='10%';
-try{
-  const to=setTimeout(()=>{if(!S.oReady){txt.textContent='OCR lento — usa ingreso manual';fill.style.width='100%';fill.style.background='var(--wa)'}},15000);
-  fill.style.width='30%';txt.textContent='Descargando OCR…';
-  S.oW=await Tesseract.createWorker('eng');
-  fill.style.width='70%';txt.textContent='Configurando…';
-  await S.oW.setParameters({tessedit_char_whitelist:'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<',tessedit_pageseg_mode:'6'});
-  clearTimeout(to);S.oReady=true;
-  fill.style.width='100%';txt.textContent='OCR listo ✓';
-  setTimeout(()=>{document.getElementById('ocrBar').style.display='none';txt.style.display='none'},2000);
-}catch(e){txt.textContent='OCR no disponible — usa ingreso manual';fill.style.width='100%';fill.style.background='var(--da)';
-  btn.disabled=true}}
-// INIT
+const fill=$('ocrFill'),txt=$('ocrTxt');fill.style.width='10%';
+try{const to=setTimeout(()=>{if(!S.oReady){txt.textContent='OCR lento — usa manual';fill.style.background='var(--wa)';fill.style.width='100%'}},15000);
+fill.style.width='30%';txt.textContent='Descargando OCR…';
+S.oW=await Tesseract.createWorker('eng');fill.style.width='70%';txt.textContent='Configurando…';
+await S.oW.setParameters({tessedit_char_whitelist:'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<',tessedit_pageseg_mode:'6'});
+clearTimeout(to);S.oReady=true;fill.style.width='100%';txt.textContent='OCR listo ✓';
+setTimeout(()=>{$('ocrBar').style.display='none';txt.style.display='none'},1800)}
+catch(e){txt.textContent='OCR no disponible';fill.style.background='var(--da)';fill.style.width='100%';$('btnScan').disabled=true}}
+
+/* INIT */
 try{const s=localStorage.getItem('ca_ep');if(s)S.ov=s}catch(e){}
-rCfg();preloadOCR();
+loadContacts();rCfg();preloadOCR();
 </script>
 </body>
-</html>
-
 </html>
