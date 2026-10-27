@@ -1,0 +1,63 @@
+name: Build APK Alechcora
+
+on:
+  push:
+    branches: [ alechcora ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: alechcora
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Agregar plataforma Android
+        run: npx cap add android
+
+      - name: Sync
+        run: npx cap sync android
+
+      - name: Compilar APK (debug)
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Renombrar
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk Alechcora.apk
+
+      - name: Subir artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: Alechcora-apk
+          path: alechcora/Alechcora.apk
+
+      - name: Publicar release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: alechcora-build-${{ github.run_number }}
+          name: Alechcora APK (build ${{ github.run_number }})
+          files: alechcora/Alechcora.apk
