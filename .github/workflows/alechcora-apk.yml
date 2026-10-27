@@ -28,8 +28,8 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Android SDK
-        uses: android-actions/setup-android@v3
+      # El runner ubuntu-latest ya trae el Android SDK preinstalado (ANDROID_HOME),
+      # con licencias aceptadas; Gradle lo usa y auto-descarga lo que falte.
 
       - name: Instalar dependencias
         run: npm install
